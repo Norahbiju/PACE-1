@@ -1,0 +1,33 @@
+name: Deploy EC2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/pace-profile.pem
+          chmod 600 ~/.ssh/pace-profile.pem
+          ssh-keyscan -H "${{ vars.EC2_PUBLIC_IP }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy application
+        run: |
+          ssh -i ~/.ssh/pace-profile.pem "${{ vars.EC2_USER || 'ec2-user' }}@${{ vars.EC2_PUBLIC_IP }}" <<'REMOTE'
+          set -euo pipefail
+          cd /opt/pace-profile
+          git pull
+          cd app
+          npm install
+          npm run build
+          sudo systemctl restart pace-profile
+          sudo systemctl status pace-profile --no-pager
+          REMOTE
+
+      - name: Public URL
+        run: echo "PACE PROFILE is available at http://${{ vars.EC2_PUBLIC_IP }}"
