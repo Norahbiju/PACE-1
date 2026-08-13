@@ -21,7 +21,6 @@ type FilterPayload = {
 const listParam = (values: string[]) => values.join("|");
 
 export function PaceProfileApp() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(true);
   const [filters, setFilters] = useState<EmployeeFilters>(defaultFilters);
   const [filterPayload, setFilterPayload] = useState<FilterPayload>({ categories: [], ratingLabels: [] });
@@ -79,13 +78,9 @@ export function PaceProfileApp() {
     <main className="appShell">
       <Topbar />
       <section className="contentShell">
-        <aside className={`sidebar ${sidebarOpen ? "" : "collapsed"}`}>
-          <button className="edgeToggle" onClick={() => setSidebarOpen((value) => !value)} aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}>
-            {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-          </button>
-          <button className="navItem" aria-current="page">
+        <aside className="sidebar">
+          <button className="navItem" aria-current="page" aria-label="Dashboard">
             <LayoutDashboard size={22} />
-            <span className="navLabel">Dashboard</span>
           </button>
         </aside>
 
@@ -127,8 +122,8 @@ function Topbar() {
     <header className="topbar">
       <div className="brand">
         <img className="brandMark" src="/ust-global-vector-logo-2022.svg" alt="UST" />
+        <h1 className="topbarTitle">PACE PROFILE</h1>
       </div>
-      <h1 className="topbarTitle">PACE PROFILE</h1>
       <div />
     </header>
   );
@@ -207,12 +202,14 @@ function FilterPanel({
 
   return (
     <aside className={`filterPanel ${open ? "" : "closed"}`}>
-      <button className="filterCollapse" onClick={onToggleOpen} aria-label={open ? "Collapse filters" : "Expand filters"}>
-        {open ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-      </button>
       <div className="filterHeader">
-        <h2>Filters</h2>
-        <span className="activeBadge" title="Active filters">{activeFilterCount}</span>
+        <div className="filterTitleWrap">
+          {open && <h2>Filters</h2>}
+          <span className="activeBadge" title="Active filters">{activeFilterCount}</span>
+        </div>
+        <button className="filterCollapse" onClick={onToggleOpen} aria-label={open ? "Collapse filters" : "Expand filters"}>
+          {open ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+        </button>
       </div>
       <div className="filterBody">
         {payload.categories.map((category) => {
@@ -293,7 +290,6 @@ function Dashboard({
     <section className="dashboard" ref={dashboardTopRef}>
       <div className="dashboardHeader">
         <div>
-          <h2>Employee Dashboard</h2>
           <div className="dashboardMeta">{data ? `${data.total} employees found` : "Loading employees"}</div>
         </div>
         {data && <div className="dashboardMeta">Page {data.page} of {data.totalPages}</div>}
@@ -307,28 +303,31 @@ function Dashboard({
             <table className="employeeTable">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Location</th>
-                  <th>Experience</th>
-                  <th>Certifications</th>
-                  <th>Skills Snapshot</th>
+                  <th>Candidate</th>
+                  <th>Strongest Capabilities</th>
+                  <th>Profile</th>
                 </tr>
               </thead>
               <tbody>
                 {data.items.map((employee) => (
                   <tr className="employeeRow" key={employee.employeeId}>
-                    <td><button className="employeeName" onClick={() => onOpenEmployee(employee.employeeId)}>{employee.name}</button></td>
-                    <td>{employee.role}</td>
-                    <td>{employee.location}</td>
-                    <td>{employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years</td>
                     <td>
-                      <div className="chipList">
-                        {(employee.certifications.length ? employee.certifications : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
+                      <div className="candidateCell">
+                        <button className="employeeName" onClick={() => onOpenEmployee(employee.employeeId)}>{employee.name}</button>
+                        <strong>{employee.role}</strong>
+                        <span>{employee.location} - {employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years experience</span>
+                        <div className="chipList">
+                          {(employee.certifications.length ? employee.certifications.slice(0, 2) : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
+                        </div>
                       </div>
                     </td>
                     <td>
                       <SkillSnapshot employee={employee} />
+                    </td>
+                    <td>
+                      <div className="profileActionCell">
+                        <button className="profileButton" onClick={() => onOpenEmployee(employee.employeeId)}>View</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -355,7 +354,6 @@ function SkillSnapshot({ employee }: { employee: Employee }) {
 
   return (
     <div className="skillSnapshot">
-      <div className="skillSnapshotLabel">Strongest capabilities</div>
       <div className="skillPillList">
         {strongest.map((skill) => (
           <span className="skillPill" key={`${employee.employeeId}-${skill.skill}`}>
@@ -366,15 +364,17 @@ function SkillSnapshot({ employee }: { employee: Employee }) {
         {remaining > 0 && <span className="morePill">+{remaining}</span>}
       </div>
       <div className="domainLine">
-        Domains: {Array.from(new Set(strongest.map((skill) => skill.category))).slice(0, 3).join(" · ")}
+        Domains: {Array.from(new Set(strongest.map((skill) => skill.category))).slice(0, 3).join(" - ")}
       </div>
     </div>
   );
 }
 
 function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () => void }) {
-  const visibleSkills = employee.skills.filter((skill) => skill.ratingLabel !== "Not used");
-  const strongestSkills = [...visibleSkills].sort((a, b) => b.ratingLevel - a.ratingLevel).slice(0, 6);
+  const visibleSkills = employee.skills
+    .filter((skill) => skill.ratingLabel !== "Not used")
+    .sort((a, b) => b.ratingLevel - a.ratingLevel || a.skill.localeCompare(b.skill));
+  const strongestSkills = visibleSkills.slice(0, 6);
   const initials = employee.name
     .split(" ")
     .map((part) => part[0])
@@ -442,20 +442,6 @@ function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () 
               </div>
             </section>
           </div>
-
-          <aside className="profileAside">
-            <div className="profileSection compactProfileSection">
-              <h3>Certifications</h3>
-              <div className="chipList">
-                {(employee.certifications.length ? employee.certifications : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
-              </div>
-            </div>
-            <div className="profileSection compactProfileSection">
-              <h3>Contact</h3>
-              <a className="contactButton" href={`mailto:${employee.email}`}>Contact candidate</a>
-              <Detail label="Email" value={employee.email} />
-            </div>
-          </aside>
         </div>
       </article>
     </div>

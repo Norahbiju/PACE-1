@@ -48,7 +48,7 @@ button {
   top: 0;
   z-index: 50;
   display: grid;
-  grid-template-columns: 260px 1fr 260px;
+  grid-template-columns: 1fr auto;
   align-items: center;
   height: 58px;
   background: var(--ust-green);
@@ -59,7 +59,7 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding-left: 18px;
 }
 
@@ -75,9 +75,10 @@ button {
 
 .topbarTitle {
   margin: 0;
-  text-align: center;
-  font-size: 22px;
+  text-align: left;
+  font-size: 20px;
   font-weight: 700;
+  text-transform: uppercase;
   letter-spacing: 0;
 }
 
@@ -89,56 +90,42 @@ button {
 }
 
 .sidebar {
-  position: relative;
-  width: 104px;
+  position: sticky;
+  top: 58px;
+  align-self: start;
+  width: 76px;
+  min-height: calc(100vh - 58px);
   background: var(--sidebar);
   color: #ffffff;
-  padding: 18px 10px;
+  padding: 18px 8px;
   transition: width 180ms ease;
-}
-
-.sidebar.collapsed {
-  width: 54px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 72px;
+  gap: 0;
+  width: 52px;
+  height: 52px;
+  min-height: 52px;
   border: 0;
   border-left: 3px solid var(--accent);
-  background: rgba(255, 255, 255, 0.08);
+  background: #101010;
   color: #ffffff;
   border-radius: 4px;
-}
-
-.sidebar.collapsed .navLabel {
-  display: none;
-}
-
-.edgeToggle {
-  position: absolute;
-  top: 18px;
-  right: 8px;
-  width: 28px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #242424;
-  border-radius: 4px;
-  background: #050505;
-  color: #ffffff;
-  z-index: 35;
-  box-shadow: none;
+  padding: 0;
+  font-size: 14px;
+  overflow: hidden;
 }
 
 .filterPanel {
-  position: relative;
+  position: sticky;
+  top: 58px;
+  align-self: start;
   width: 292px;
   min-width: 292px;
+  height: calc(100vh - 58px);
   background: var(--filter-bg);
   border-right: 1px solid var(--line);
   display: grid;
@@ -147,12 +134,11 @@ button {
 }
 
 .filterPanel.closed {
-  width: 0;
-  min-width: 0;
-  border-right: 0;
+  width: 48px;
+  min-width: 48px;
+  border-right: 1px solid var(--line);
 }
 
-.filterPanel.closed .filterHeader,
 .filterPanel.closed .filterBody,
 .filterPanel.closed .filterFooter {
   display: none;
@@ -163,8 +149,16 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 18px;
+  gap: 10px;
+  padding: 16px;
   border-bottom: 1px solid var(--line);
+}
+
+.filterTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .filterHeader h2 {
@@ -185,10 +179,7 @@ button {
 }
 
 .filterCollapse {
-  position: absolute;
-  top: 18px;
-  right: -13px;
-  z-index: 30;
+  position: static;
   width: 28px;
   height: 30px;
   border: 1px solid var(--line);
@@ -197,7 +188,18 @@ button {
   color: var(--ust-green);
   display: grid;
   place-items: center;
-  box-shadow: 0 3px 8px rgba(44, 62, 80, 0.12);
+  box-shadow: none;
+  flex: 0 0 auto;
+}
+
+.filterPanel.closed .filterHeader {
+  justify-content: center;
+  padding: 12px 8px;
+  border-bottom: 0;
+}
+
+.filterPanel.closed .activeBadge {
+  display: none;
 }
 
 .filterBody {
@@ -242,13 +244,14 @@ button {
 .filterGroupHeader {
   min-height: 34px;
   font-weight: 700;
+  font-size: 14px;
 }
 
 .filterOption,
 .ratingOption {
   min-height: 30px;
   padding-left: 24px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .ratingWrap {
@@ -276,11 +279,6 @@ button {
   margin-bottom: 16px;
 }
 
-.dashboardHeader h2 {
-  margin: 0;
-  font-size: 22px;
-}
-
 .dashboardMeta {
   color: var(--muted);
   font-size: 14px;
@@ -301,7 +299,7 @@ button {
 
 .employeeTable th,
 .employeeTable td {
-  padding: 13px 14px;
+  padding: 18px 20px;
   border-bottom: 1px solid #e3e9ed;
   text-align: left;
   vertical-align: top;
@@ -313,6 +311,18 @@ button {
   font-size: 12px;
   text-transform: uppercase;
   color: #4f5d6d;
+}
+
+.employeeTable th:nth-child(1) {
+  width: 30%;
+}
+
+.employeeTable th:nth-child(2) {
+  width: 58%;
+}
+
+.employeeTable th:nth-child(3) {
+  width: 12%;
 }
 
 .employeeRow {
@@ -330,6 +340,41 @@ button {
   padding: 0;
   font-weight: 700;
   text-align: left;
+  font-size: 16px;
+}
+
+.candidateCell {
+  display: grid;
+  gap: 7px;
+}
+
+.candidateCell strong {
+  color: #16293a;
+  font-weight: 700;
+}
+
+.candidateCell > span {
+  color: #5f6f7f;
+  font-size: 13px;
+}
+
+.profileActionCell {
+  display: grid;
+  align-content: center;
+  justify-content: start;
+  min-height: 72px;
+}
+
+.profileButton {
+  width: fit-content;
+  min-height: 30px;
+  border: 1px solid var(--ust-green);
+  border-radius: 5px;
+  background: #ffffff;
+  color: var(--ust-green);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .chipList {
@@ -364,13 +409,6 @@ button {
   gap: 7px;
 }
 
-.skillSnapshotLabel {
-  color: #6b7480;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
 .skillPillList {
   display: flex;
   flex-wrap: wrap;
@@ -382,7 +420,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 28px;
+  min-height: 30px;
   border: 1px solid #d9e3e6;
   border-radius: 5px;
   background: #f7fbfc;
@@ -555,8 +593,8 @@ button {
 
 .profileBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 0;
   padding: 18px;
 }
 
@@ -589,7 +627,7 @@ button {
 
 .capabilityGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
   gap: 10px;
 }
 
@@ -624,12 +662,6 @@ button {
   font-weight: 800;
 }
 
-.profileAside {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-}
-
 .compactProfileSection {
   display: grid;
   gap: 12px;
@@ -643,11 +675,16 @@ button {
 
 .contactButton {
   justify-content: center;
-  min-height: 42px;
+  width: fit-content;
+  min-width: 120px;
+  min-height: 34px;
   border-radius: 6px;
-  background: var(--ust-green);
-  color: #ffffff;
-  font-weight: 800;
+  border: 1px solid var(--ust-green);
+  background: #ffffff;
+  color: var(--ust-green);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -672,6 +709,7 @@ button {
   border-radius: 6px;
   padding: 12px;
   background: #fbfdfe;
+  min-width: 0;
 }
 
 .detailLabel {
@@ -681,9 +719,15 @@ button {
   margin-bottom: 4px;
 }
 
+.detailItem strong {
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .skillGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
   gap: 10px;
 }
 
@@ -738,11 +782,12 @@ button {
 
 @media (max-width: 920px) {
   .topbar {
-    grid-template-columns: 150px 1fr 36px;
+    grid-template-columns: 1fr;
   }
 
   .brandMark {
-    width: 76px;
+    width: 40px;
+    height: 40px;
   }
 
   .contentShell {
