@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::484632959006:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": [
+            "repo:Norahbiju/PACE-1:*",
+            "repo:Norahbiju/pace-1:*",
+            "repo:norahbiju/PACE-1:*",
+            "repo:norahbiju/pace-1:*"
+          ]
+        }
+      }
+    }
+  ]
+}

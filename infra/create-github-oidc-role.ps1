@@ -19,6 +19,18 @@ if ($providerExists -eq "None" -or [string]::IsNullOrWhiteSpace($providerExists)
     --thumbprint-list "6938fd4d98bab03faadb97b34396831e3780aea1" | Out-Null
 }
 
+$repoVariants = @(
+  "repo:$GitHubRepository`:*",
+  "repo:$($GitHubRepository.ToLowerInvariant())`:*"
+)
+
+if ($GitHubRepository -eq "Norahbiju/PACE-1") {
+  $repoVariants += @(
+    "repo:Norahbiju/pace-1:*",
+    "repo:norahbiju/PACE-1:*"
+  )
+}
+
 $trustPolicy = @{
   Version = "2012-10-17"
   Statement = @(
@@ -33,7 +45,7 @@ $trustPolicy = @{
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = @{
-          "token.actions.githubusercontent.com:sub" = "repo:$GitHubRepository`:*"
+          "token.actions.githubusercontent.com:sub" = $repoVariants
         }
       }
     }
