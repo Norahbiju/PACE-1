@@ -25,6 +25,13 @@ DYNAMODB_TABLE_NAME=${dynamodb_table_name}
 NEXT_PUBLIC_APP_NAME=PACE PROFILE
 EOF
 
+if [ ! -f /swapfile ]; then
+  fallocate -l 2G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+fi
+swapon /swapfile || true
+
 npm install
 npm run build
 
@@ -50,7 +57,6 @@ EOF
 cat > /etc/nginx/conf.d/pace-profile.conf <<EOF
 server {
   listen 80;
-  server_name _;
 
   location / {
     proxy_pass http://127.0.0.1:$APP_PORT;
@@ -62,6 +68,8 @@ server {
   }
 }
 EOF
+
+rm -f /etc/nginx/conf.d/default.conf
 
 systemctl daemon-reload
 systemctl enable pace-profile

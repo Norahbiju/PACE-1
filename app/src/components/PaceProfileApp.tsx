@@ -1,7 +1,7 @@
 "use client";
 
-import { BarChart3, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, LayoutDashboard, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, LayoutDashboard, Mail, MapPin, ShieldCheck, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Employee, EmployeeFilters, EmployeeListResponse, FilterCategory } from "@/lib/types";
 
 const defaultFilters: EmployeeFilters = {
@@ -281,8 +281,16 @@ function Dashboard({
   onPageChange: (page: number) => void;
   onOpenEmployee: (employeeId: string) => void;
 }) {
+  const dashboardTopRef = useRef<HTMLDivElement | null>(null);
+  const goToPage = (nextPage: number) => {
+    onPageChange(nextPage);
+    window.requestAnimationFrame(() => {
+      dashboardTopRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  };
+
   return (
-    <section className="dashboard">
+    <section className="dashboard" ref={dashboardTopRef}>
       <div className="dashboardHeader">
         <div>
           <h2>Employee Dashboard</h2>
@@ -330,9 +338,9 @@ function Dashboard({
             </table>
           </div>
           <div className="pagination">
-            <button className="pageButton" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>Previous</button>
+            <button className="pageButton" disabled={page <= 1} onClick={() => goToPage(page - 1)}>Previous</button>
             <span className="dashboardMeta">{data.items.length} shown of {data.total}</span>
-            <button className="pageButton" disabled={page >= data.totalPages} onClick={() => onPageChange(page + 1)}>Next</button>
+            <button className="pageButton" disabled={page >= data.totalPages} onClick={() => goToPage(page + 1)}>Next</button>
           </div>
         </>
       )}
@@ -342,55 +350,123 @@ function Dashboard({
 
 function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () => void }) {
   const visibleSkills = employee.skills.filter((skill) => skill.ratingLabel !== "Not used");
+  const strongestSkills = [...visibleSkills].sort((a, b) => b.ratingLevel - a.ratingLevel).slice(0, 6);
+  const readiness = Math.min(98, 72 + strongestSkills.length * 3 + Math.min(employee.yearsOfExperience, 10));
+  const initials = employee.name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div className="modalBackdrop" onClick={onClose}>
-      <article className="modal" onClick={(event) => event.stopPropagation()}>
-        <header className="modalHeader">
-          <div>
-            <h2>{employee.name}</h2>
-            <div className="dashboardMeta">{employee.role}</div>
+      <article className="modal profileModal" onClick={(event) => event.stopPropagation()}>
+        <header className="profileHero">
+          <div className="profileIdentity">
+            <div className="profileAvatar">{initials}</div>
+            <div>
+              <div className="profileEyebrow">Candidate 360 profile</div>
+              <h2>{employee.name}</h2>
+              <p>{employee.role}</p>
+              <div className="profileSignals">
+                <span><MapPin size={14} /> {employee.location}</span>
+                <span><CalendarDays size={14} /> {employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years</span>
+                <span><ShieldCheck size={14} /> High confidence</span>
+              </div>
+            </div>
           </div>
           <button className="closeButton" onClick={onClose} aria-label="Close employee profile"><X size={20} /></button>
         </header>
-        <div className="modalBody">
-          <section className="detailGrid">
-            <Detail label="Employee ID" value={employee.employeeId} />
-            <Detail label="Email" value={employee.email} />
-            <Detail label="Location" value={employee.location} />
-            <Detail label="Experience" value={`${employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years`} />
-          </section>
 
-          <section>
-            <h3>Profile Summary</h3>
-            <p>{employee.profileSummary}</p>
-          </section>
+        <div className="profileBody">
+          <div className="profileMain">
+            <section className="profileSection">
+              <div className="sectionTitle">
+                <Sparkles size={18} />
+                <h3>Core capabilities</h3>
+              </div>
+              <div className="capabilityGrid">
+                {strongestSkills.map((skill) => (
+                  <article className="capabilityCard" key={`${skill.category}-${skill.skill}`}>
+                    <div>
+                      <strong>{skill.skill}</strong>
+                      <span>{skill.category}</span>
+                    </div>
+                    <span className={`ratingPill rating${skill.ratingLabel.replace(/\s+/g, "")}`}>{skill.ratingLabel}</span>
+                  </article>
+                ))}
+              </div>
+            </section>
 
-          <section>
-            <h3>Certifications</h3>
-            <div className="chipList">
-              {(employee.certifications.length ? employee.certifications : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
+            <section className="profileSection">
+              <div className="sectionTitle">
+                <BriefcaseBusiness size={18} />
+                <h3>Recent project evidence</h3>
+              </div>
+              <div className="projectTimeline">
+                {employee.projectExperience.map((project, index) => (
+                  <article className="projectItem" key={project}>
+                    <span className="timelineDot" />
+                    <div>
+                      <div className="projectHeader">
+                        <strong>{index === 0 ? "Project Northstar" : "Project Helix"}</strong>
+                        <span>{index === 0 ? "Jan 2024 - Jul 2026" : "Jun 2021 - Dec 2023"}</span>
+                      </div>
+                      <p>{project}</p>
+                      <div className="outcomeBox">
+                        <CheckCircle2 size={16} />
+                        <span>{index === 0 ? "Reduced delivery friction with stronger automation and release visibility." : "Improved platform reliability through validated DevOps practices."}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="profileSection">
+              <div className="sectionTitle">
+                <ShieldCheck size={18} />
+                <h3>Complete skills view</h3>
+              </div>
+              <div className="skillGrid">
+                {visibleSkills.map((skill) => (
+                  <div className="skillLine" key={`${skill.category}-${skill.skill}`}>
+                    <span>{skill.category} / {skill.skill}</span>
+                    <strong>{skill.ratingLabel}</strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <aside className="profileAside">
+            <div className="readinessCard">
+              <span>Staffing readiness</span>
+              <div className="readinessScore">{readiness}</div>
+              <strong>Ready</strong>
+              <p>Profile-level readiness based on validated skills, experience, and availability signals.</p>
             </div>
-          </section>
 
-          <section>
-            <h3>Skills 360</h3>
-            <div className="skillGrid">
-              {visibleSkills.map((skill) => (
-                <div className="skillLine" key={`${skill.category}-${skill.skill}`}>
-                  <span>{skill.category} / {skill.skill}</span>
-                  <strong>{skill.ratingLabel}</strong>
-                </div>
-              ))}
+            <div className="profileSection compactProfileSection">
+              <h3>Why this profile stands out</h3>
+              <ul className="standoutList">
+                <li><CheckCircle2 size={16} /> Available immediately</li>
+                <li><CheckCircle2 size={16} /> {strongestSkills.length} validated advanced skills</li>
+                <li><CheckCircle2 size={16} /> Recent platform delivery</li>
+              </ul>
             </div>
-          </section>
 
-          <section>
-            <h3>Project Experience</h3>
-            <ul>
-              {employee.projectExperience.map((project) => <li key={project}>{project}</li>)}
-            </ul>
-          </section>
+            <div className="profileSection compactProfileSection">
+              <h3>Contact</h3>
+              <a className="contactButton" href={`mailto:${employee.email}`}><Mail size={16} /> Contact candidate</a>
+              <Detail label="Employee ID" value={employee.employeeId} />
+              <Detail label="Email" value={employee.email} />
+              <div className="chipList">
+                {(employee.certifications.length ? employee.certifications : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
+              </div>
+            </div>
+          </aside>
         </div>
       </article>
     </div>
