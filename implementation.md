@@ -433,7 +433,7 @@ The seed workflow must:
 9. Replicate additional sample employees deterministically from available sample data.
 10. Keep generated data realistic and alphabetically sortable.
 11. Validate no duplicate `employeeId` values before writing to DynamoDB.
-12. Use AWS credentials from GitHub secrets or local environment variables.
+12. Use GitHub OIDC role assumption in workflows; do not use long-lived AWS access-key secrets.
 
 ## Infrastructure Plan
 
@@ -450,12 +450,12 @@ Provision:
 
 - EC2 instance
 - Security group exposing:
-  - SSH, restricted by variable where possible
   - HTTP app port, default `80`
-  - optional app internal port, default `3000`
-- IAM role/profile for EC2 to access DynamoDB
+  - no SSH port
+  - no public app internal port
+- IAM role/profile for EC2 to access DynamoDB and AWS Systems Manager
 - DynamoDB table
-- optional Elastic IP if approved during implementation
+- no Elastic IP by default
 
 Terraform outputs:
 
@@ -476,6 +476,7 @@ The EC2 bootstrap should:
 6. Configure environment variables.
 7. Run the app as a systemd service.
 8. Expose the app through public IP.
+9. Enable AWS Systems Manager agent for no-SSH deployment.
 
 ## GitHub Actions Plan
 
@@ -489,7 +490,7 @@ Manual input:
 
 Responsibilities:
 
-- configure AWS credentials
+- assume AWS IAM role through GitHub OIDC
 - initialize Terraform
 - run selected action
 - expose Terraform outputs in workflow logs
@@ -499,7 +500,7 @@ Responsibilities:
 Manual workflow:
 
 - install app dependencies
-- authenticate to AWS
+- assume AWS IAM role through GitHub OIDC
 - run seed script
 - verify duplicates are not inserted
 - print seed summary
@@ -508,8 +509,8 @@ Manual workflow:
 
 Manual workflow:
 
-- authenticate to AWS
-- connect to EC2 or trigger remote deploy
+- assume AWS IAM role through GitHub OIDC
+- trigger EC2 deployment through AWS Systems Manager Run Command
 - pull latest code
 - install dependencies
 - build app
@@ -518,20 +519,19 @@ Manual workflow:
 
 ## Required GitHub Secrets And Variables
 
-### Required Secrets
+### Required Secret
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
+- `AWS_GITHUB_OIDC_ROLE_ARN`
+
+### Required Variables
+
 - `AWS_REGION`
-- `EC2_SSH_PRIVATE_KEY`
+- `EC2_INSTANCE_ID`
 
 ### Recommended Variables
 
-- `AWS_REGION`
 - `DYNAMODB_TABLE_NAME`
 - `EC2_INSTANCE_TYPE`
-- `EC2_KEY_NAME`
-- `ALLOWED_SSH_CIDR`
 - `APP_PORT`
 - `NEXT_PUBLIC_APP_NAME`
 
@@ -660,10 +660,10 @@ Approved decisions:
 
 1. Build locally first, then connect to the GitHub repository and push later.
 2. Use the EC2 public IP assigned at launch. Do not create an Elastic IP by default.
-3. Open SSH to `0.0.0.0/0`.
+3. SSH has been removed from the deployment path. GitHub Actions will use AWS OIDC and SSM Run Command instead of SSH.
 4. Generate sample data targeting 50 employees.
 
-Implementation note: opening SSH to `0.0.0.0/0` is intentionally allowed for this plan, but Terraform should keep it configurable through `ALLOWED_SSH_CIDR` so it can be restricted later without changing code.
+Implementation note: no SSH private key, EC2 key pair, or `ALLOWED_SSH_CIDR` variable is required after the OIDC/SSM change.
 
 ## Approval Gate
 

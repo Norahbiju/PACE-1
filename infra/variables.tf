@@ -18,15 +18,6 @@ variable "ec2_instance_type" {
   default = "t3.micro"
 }
 
-variable "ec2_key_name" {
-  type = string
-}
-
-variable "allowed_ssh_cidr" {
-  type    = string
-  default = "0.0.0.0/0"
-}
-
 variable "app_port" {
   type    = number
   default = 3000

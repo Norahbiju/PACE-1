@@ -15,6 +15,9 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     defaults:
       run:
         working-directory: infra
@@ -23,9 +26,8 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION || secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - uses: hashicorp/setup-terraform@v3
 
@@ -33,15 +35,15 @@ jobs:
 
       - name: Terraform plan
         if: inputs.action == 'plan'
-        run: terraform plan -var="aws_region=${{ vars.AWS_REGION || secrets.AWS_REGION }}" -var="ec2_key_name=${{ vars.EC2_KEY_NAME }}" -var="allowed_ssh_cidr=${{ vars.ALLOWED_SSH_CIDR || '0.0.0.0/0' }}"
+        run: terraform plan -var="aws_region=${{ vars.AWS_REGION }}"
 
       - name: Terraform apply
         if: inputs.action == 'apply'
-        run: terraform apply -auto-approve -var="aws_region=${{ vars.AWS_REGION || secrets.AWS_REGION }}" -var="ec2_key_name=${{ vars.EC2_KEY_NAME }}" -var="allowed_ssh_cidr=${{ vars.ALLOWED_SSH_CIDR || '0.0.0.0/0' }}"
+        run: terraform apply -auto-approve -var="aws_region=${{ vars.AWS_REGION }}"
 
       - name: Terraform destroy
         if: inputs.action == 'destroy'
-        run: terraform destroy -auto-approve -var="aws_region=${{ vars.AWS_REGION || secrets.AWS_REGION }}" -var="ec2_key_name=${{ vars.EC2_KEY_NAME }}" -var="allowed_ssh_cidr=${{ vars.ALLOWED_SSH_CIDR || '0.0.0.0/0' }}"
+        run: terraform destroy -auto-approve -var="aws_region=${{ vars.AWS_REGION }}"
 
       - name: Outputs
         if: inputs.action == 'apply'

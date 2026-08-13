@@ -5,9 +5,11 @@ APP_DIR="/opt/pace-profile"
 APP_PORT="${app_port}"
 
 dnf update -y
-dnf install -y git nginx
+dnf install -y git nginx amazon-ssm-agent
 curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
 dnf install -y nodejs
+systemctl enable amazon-ssm-agent
+systemctl restart amazon-ssm-agent
 
 if [ ! -d "$APP_DIR/.git" ]; then
   git clone "${repo_url}" "$APP_DIR"

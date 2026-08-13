@@ -43,7 +43,10 @@ Use these files as the approved source of truth for component behavior and const
 
 - Terraform should expose the application via the EC2 public IP assigned at launch.
 - Do not create an Elastic IP by default.
-- SSH is currently approved as `0.0.0.0/0`, but keep it configurable with `ALLOWED_SSH_CIDR`.
+- Do not use SSH for deployment.
+- Do not require an EC2 SSH key pair or GitHub SSH private key secret.
+- GitHub Actions must authenticate to AWS with GitHub OIDC and an IAM role.
+- EC2 deployment must use AWS Systems Manager Run Command.
 - GitHub Actions must support manual workflow dispatch for Terraform plan/apply/destroy, DynamoDB seeding, and EC2 deployment.
 
 ## Data Expectations
