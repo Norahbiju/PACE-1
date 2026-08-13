@@ -20,14 +20,12 @@ if ($providerExists -eq "None" -or [string]::IsNullOrWhiteSpace($providerExists)
 }
 
 $repoVariants = @(
-  "repo:$GitHubRepository`:*",
-  "repo:$($GitHubRepository.ToLowerInvariant())`:*"
+  "repo:$GitHubRepository`:*"
 )
 
 if ($GitHubRepository -eq "Norahbiju/PACE-1") {
   $repoVariants += @(
-    "repo:Norahbiju/pace-1:*",
-    "repo:norahbiju/PACE-1:*"
+    "repo:Norahbiju@262330368/PACE-1@1331767857:*"
   )
 }
 
