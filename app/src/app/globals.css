@@ -64,12 +64,12 @@ button {
 }
 
 .brandMark {
-  width: 78px;
-  max-height: 34px;
+  width: 44px;
+  height: 44px;
   display: block;
   background: #ffffff;
-  border-radius: 3px;
-  padding: 3px;
+  border-radius: 4px;
+  padding: 5px;
   object-fit: contain;
 }
 
@@ -122,18 +122,17 @@ button {
 .edgeToggle {
   position: absolute;
   top: 18px;
-  right: -18px;
-  width: 36px;
-  height: 42px;
+  right: 8px;
+  width: 28px;
+  height: 30px;
   display: grid;
   place-items: center;
-  border: 1px solid #193936;
-  border-left: 0;
-  border-radius: 0 5px 5px 0;
+  border: 1px solid #242424;
+  border-radius: 4px;
   background: #050505;
   color: #ffffff;
   z-index: 35;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  box-shadow: none;
 }
 
 .filterPanel {
@@ -187,18 +186,18 @@ button {
 
 .filterCollapse {
   position: absolute;
-  top: 14px;
-  right: -17px;
+  top: 18px;
+  right: -13px;
   z-index: 30;
-  width: 34px;
-  height: 42px;
+  width: 28px;
+  height: 30px;
   border: 1px solid var(--line);
-  border-radius: 0 5px 5px 0;
+  border-radius: 4px;
   background: #ffffff;
   color: var(--ust-green);
   display: grid;
   place-items: center;
-  box-shadow: 0 8px 18px rgba(44, 62, 80, 0.16);
+  box-shadow: 0 3px 8px rgba(44, 62, 80, 0.12);
 }
 
 .filterBody {
@@ -347,6 +346,73 @@ button {
   font-size: 12px;
 }
 
+.ratingToggleButton {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  margin-left: auto;
+  border: 1px solid #c8d4d8;
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--ust-green);
+  flex: 0 0 auto;
+}
+
+.skillSnapshot {
+  display: grid;
+  gap: 7px;
+}
+
+.skillSnapshotLabel {
+  color: #6b7480;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.skillPillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.skillPill,
+.morePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  border: 1px solid #d9e3e6;
+  border-radius: 5px;
+  background: #f7fbfc;
+  color: #203845;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.skillPill strong {
+  font-size: 12px;
+}
+
+.skillPill em {
+  color: #577178;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.morePill {
+  background: #e8f3f5;
+  color: var(--ust-green);
+  font-weight: 800;
+}
+
+.domainLine {
+  color: #82909b;
+  font-size: 11px;
+}
+
 .pagination {
   display: flex;
   justify-content: flex-end;
@@ -387,7 +453,7 @@ button {
 }
 
 .profileModal {
-  background: #f7f6f0;
+  background: var(--dashboard-bg);
 }
 
 .modalHeader {
@@ -428,8 +494,8 @@ button {
   justify-content: space-between;
   gap: 18px;
   padding: 20px 24px;
-  background: #fffdf8;
-  border-bottom: 1px solid #e4dfd3;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
 }
 
 .profileIdentity {
@@ -444,14 +510,14 @@ button {
   display: grid;
   place-items: center;
   border-radius: 14px;
-  background: #577467;
+  background: var(--ust-green);
   color: #ffffff;
   font-weight: 800;
   font-size: 20px;
 }
 
 .profileEyebrow {
-  color: #8a7c62;
+  color: var(--ust-green);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -468,7 +534,7 @@ button {
 
 .profileHero p {
   margin-top: 3px;
-  color: #59665c;
+  color: #41515f;
   font-weight: 700;
 }
 
@@ -477,7 +543,7 @@ button {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 9px;
-  color: #687367;
+  color: #596879;
   font-size: 13px;
 }
 
@@ -489,7 +555,7 @@ button {
 
 .profileBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-columns: minmax(0, 1fr) 280px;
   gap: 16px;
   padding: 18px;
 }
@@ -500,11 +566,11 @@ button {
 }
 
 .profileSection {
-  background: #fffdf8;
-  border: 1px solid #e5dfd2;
+  background: #ffffff;
+  border: 1px solid #c6d1d6;
   border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 4px 12px rgba(48, 45, 36, 0.06);
+  box-shadow: 0 4px 12px rgba(24, 44, 55, 0.06);
 }
 
 .sectionTitle {
@@ -512,7 +578,7 @@ button {
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  color: #4b655b;
+  color: #173642;
 }
 
 .sectionTitle h3,
@@ -533,7 +599,7 @@ button {
   flex-direction: column;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid #e2ded3;
+  border: 1px solid #d9e3e6;
   border-radius: 7px;
   padding: 12px;
   background: #ffffff;
@@ -545,7 +611,7 @@ button {
 }
 
 .capabilityCard span {
-  color: #718071;
+  color: #657483;
   font-size: 12px;
 }
 
@@ -553,73 +619,9 @@ button {
   width: fit-content;
   border-radius: 4px;
   padding: 4px 8px;
-  background: #e9f3ef;
-  color: #557064;
+  background: #e8f3f5;
+  color: var(--ust-green);
   font-weight: 800;
-}
-
-.ratingExpert,
-.ratingMastery {
-  background: #e2f2ea;
-  color: #496d5b;
-}
-
-.ratingAdvanced {
-  background: #fff3d9;
-  color: #806534;
-}
-
-.ratingWorking {
-  background: #eaf4f7;
-  color: #526d78;
-}
-
-.projectTimeline {
-  display: grid;
-  gap: 16px;
-}
-
-.projectItem {
-  position: relative;
-  display: grid;
-  grid-template-columns: 18px 1fr;
-  gap: 10px;
-}
-
-.timelineDot {
-  width: 10px;
-  height: 10px;
-  margin-top: 5px;
-  border: 2px solid #6f8a7e;
-  border-radius: 50%;
-}
-
-.projectHeader {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: #27352e;
-}
-
-.projectHeader span {
-  color: #8a8f86;
-  font-size: 12px;
-}
-
-.projectItem p {
-  margin: 6px 0 10px;
-  color: #5e665f;
-}
-
-.outcomeBox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-left: 3px solid #6f8a7e;
-  border-radius: 5px;
-  background: #eef3ef;
-  padding: 10px;
-  color: #56695f;
 }
 
 .profileAside {
@@ -628,61 +630,11 @@ button {
   gap: 16px;
 }
 
-.readinessCard {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-  background: #fffdf8;
-  border: 1px solid #e5dfd2;
-  border-radius: 8px;
-  padding: 18px;
-  box-shadow: 0 4px 12px rgba(48, 45, 36, 0.08);
-}
-
-.readinessCard > span {
-  color: #7e7b70;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.readinessCard strong {
-  font-size: 24px;
-}
-
-.readinessCard p {
-  margin: 0;
-  color: #6d746d;
-  font-size: 13px;
-}
-
-.readinessScore {
-  width: 76px;
-  height: 76px;
-  display: grid;
-  place-items: center;
-  border: 7px solid #6f8a7e;
-  border-radius: 50%;
-  color: #6f8a7e;
-  font-size: 24px;
-  font-weight: 800;
-}
-
 .compactProfileSection {
   display: grid;
   gap: 12px;
 }
 
-.standoutList {
-  display: grid;
-  gap: 9px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  color: #5f6d62;
-}
-
-.standoutList li,
 .contactButton {
   display: flex;
   align-items: center;
@@ -693,10 +645,20 @@ button {
   justify-content: center;
   min-height: 42px;
   border-radius: 6px;
-  background: #334a41;
+  background: var(--ust-green);
   color: #ffffff;
   font-weight: 800;
   text-decoration: none;
+}
+
+.profileSummaryText {
+  margin: 0 0 14px;
+  color: #40505d;
+  line-height: 1.55;
+}
+
+.profileDetailGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .detailGrid {

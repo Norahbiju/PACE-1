@@ -1,6 +1,6 @@
 "use client";
 
-import { BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, LayoutDashboard, Mail, MapPin, ShieldCheck, Sparkles, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, LayoutDashboard, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Employee, EmployeeFilters, EmployeeListResponse, FilterCategory } from "@/lib/types";
 
@@ -239,8 +239,8 @@ function FilterPanel({
                       <input type="checkbox" checked={selected} onChange={() => toggleOption(category, option.name)} />
                       <span>{option.name}</span>
                       {category.type === "skills" && selected && (
-                        <button type="button" className="secondaryButton" onClick={(event) => { event.preventDefault(); toggleRatingExpanded(ratingKey); }}>
-                          {ratingExpanded.has(ratingKey) ? "Hide" : "Ratings"}
+                        <button type="button" className="ratingToggleButton" aria-label={ratingExpanded.has(ratingKey) ? "Hide rating filters" : "Show rating filters"} onClick={(event) => { event.preventDefault(); toggleRatingExpanded(ratingKey); }}>
+                          <SlidersHorizontal size={15} />
                         </button>
                       )}
                     </label>
@@ -328,9 +328,7 @@ function Dashboard({
                       </div>
                     </td>
                     <td>
-                      <div className="chipList">
-                        {employee.skills.filter((skill) => skill.ratingLabel !== "Not used").slice(0, 4).map((skill) => <span className="chip" key={`${employee.employeeId}-${skill.skill}`}>{skill.skill}: {skill.ratingLabel}</span>)}
-                      </div>
+                      <SkillSnapshot employee={employee} />
                     </td>
                   </tr>
                 ))}
@@ -348,10 +346,35 @@ function Dashboard({
   );
 }
 
+function SkillSnapshot({ employee }: { employee: Employee }) {
+  const strongest = employee.skills
+    .filter((skill) => skill.ratingLabel !== "Not used")
+    .sort((a, b) => b.ratingLevel - a.ratingLevel)
+    .slice(0, 4);
+  const remaining = Math.max(employee.skills.filter((skill) => skill.ratingLabel !== "Not used").length - strongest.length, 0);
+
+  return (
+    <div className="skillSnapshot">
+      <div className="skillSnapshotLabel">Strongest capabilities</div>
+      <div className="skillPillList">
+        {strongest.map((skill) => (
+          <span className="skillPill" key={`${employee.employeeId}-${skill.skill}`}>
+            <strong>{skill.skill}</strong>
+            <em>{skill.ratingLabel}</em>
+          </span>
+        ))}
+        {remaining > 0 && <span className="morePill">+{remaining}</span>}
+      </div>
+      <div className="domainLine">
+        Domains: {Array.from(new Set(strongest.map((skill) => skill.category))).slice(0, 3).join(" · ")}
+      </div>
+    </div>
+  );
+}
+
 function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () => void }) {
   const visibleSkills = employee.skills.filter((skill) => skill.ratingLabel !== "Not used");
   const strongestSkills = [...visibleSkills].sort((a, b) => b.ratingLevel - a.ratingLevel).slice(0, 6);
-  const readiness = Math.min(98, 72 + strongestSkills.length * 3 + Math.min(employee.yearsOfExperience, 10));
   const initials = employee.name
     .split(" ")
     .map((part) => part[0])
@@ -370,9 +393,9 @@ function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () 
               <h2>{employee.name}</h2>
               <p>{employee.role}</p>
               <div className="profileSignals">
-                <span><MapPin size={14} /> {employee.location}</span>
-                <span><CalendarDays size={14} /> {employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years</span>
-                <span><ShieldCheck size={14} /> High confidence</span>
+                <span>{employee.location}</span>
+                <span>{employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years experience</span>
+                <span>{employee.certifications.length ? employee.certifications.join(", ") : "No certification"}</span>
               </div>
             </div>
           </div>
@@ -382,10 +405,7 @@ function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () 
         <div className="profileBody">
           <div className="profileMain">
             <section className="profileSection">
-              <div className="sectionTitle">
-                <Sparkles size={18} />
-                <h3>Core capabilities</h3>
-              </div>
+              <div className="sectionTitle"><h3>Core capabilities</h3></div>
               <div className="capabilityGrid">
                 {strongestSkills.map((skill) => (
                   <article className="capabilityCard" key={`${skill.category}-${skill.skill}`}>
@@ -400,35 +420,18 @@ function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () 
             </section>
 
             <section className="profileSection">
-              <div className="sectionTitle">
-                <BriefcaseBusiness size={18} />
-                <h3>Recent project evidence</h3>
-              </div>
-              <div className="projectTimeline">
-                {employee.projectExperience.map((project, index) => (
-                  <article className="projectItem" key={project}>
-                    <span className="timelineDot" />
-                    <div>
-                      <div className="projectHeader">
-                        <strong>{index === 0 ? "Project Northstar" : "Project Helix"}</strong>
-                        <span>{index === 0 ? "Jan 2024 - Jul 2026" : "Jun 2021 - Dec 2023"}</span>
-                      </div>
-                      <p>{project}</p>
-                      <div className="outcomeBox">
-                        <CheckCircle2 size={16} />
-                        <span>{index === 0 ? "Reduced delivery friction with stronger automation and release visibility." : "Improved platform reliability through validated DevOps practices."}</span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
+              <div className="sectionTitle"><h3>Candidate summary</h3></div>
+              <p className="profileSummaryText">{employee.profileSummary}</p>
+              <div className="detailGrid profileDetailGrid">
+                <Detail label="Employee ID" value={employee.employeeId} />
+                <Detail label="Email" value={employee.email} />
+                <Detail label="Location" value={employee.location} />
+                <Detail label="Experience" value={`${employee.yearsOfExperience >= 10 ? "10+" : employee.yearsOfExperience} years`} />
               </div>
             </section>
 
             <section className="profileSection">
-              <div className="sectionTitle">
-                <ShieldCheck size={18} />
-                <h3>Complete skills view</h3>
-              </div>
+              <div className="sectionTitle"><h3>Complete skills view</h3></div>
               <div className="skillGrid">
                 {visibleSkills.map((skill) => (
                   <div className="skillLine" key={`${skill.category}-${skill.skill}`}>
@@ -441,30 +444,16 @@ function EmployeeModal({ employee, onClose }: { employee: Employee; onClose: () 
           </div>
 
           <aside className="profileAside">
-            <div className="readinessCard">
-              <span>Staffing readiness</span>
-              <div className="readinessScore">{readiness}</div>
-              <strong>Ready</strong>
-              <p>Profile-level readiness based on validated skills, experience, and availability signals.</p>
-            </div>
-
             <div className="profileSection compactProfileSection">
-              <h3>Why this profile stands out</h3>
-              <ul className="standoutList">
-                <li><CheckCircle2 size={16} /> Available immediately</li>
-                <li><CheckCircle2 size={16} /> {strongestSkills.length} validated advanced skills</li>
-                <li><CheckCircle2 size={16} /> Recent platform delivery</li>
-              </ul>
-            </div>
-
-            <div className="profileSection compactProfileSection">
-              <h3>Contact</h3>
-              <a className="contactButton" href={`mailto:${employee.email}`}><Mail size={16} /> Contact candidate</a>
-              <Detail label="Employee ID" value={employee.employeeId} />
-              <Detail label="Email" value={employee.email} />
+              <h3>Certifications</h3>
               <div className="chipList">
                 {(employee.certifications.length ? employee.certifications : ["No certification"]).map((certification) => <span className="chip" key={certification}>{certification}</span>)}
               </div>
+            </div>
+            <div className="profileSection compactProfileSection">
+              <h3>Contact</h3>
+              <a className="contactButton" href={`mailto:${employee.email}`}>Contact candidate</a>
+              <Detail label="Email" value={employee.email} />
             </div>
           </aside>
         </div>
